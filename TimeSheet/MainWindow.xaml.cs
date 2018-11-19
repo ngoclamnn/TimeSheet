@@ -78,11 +78,11 @@ namespace TimeSheet
             {
                 notificationManager.Show(new NotificationContent
                 {
-                    //Title = "Working time is enough!",
-                    Message = "Can go home now.",
+                    Title = "Enough working time",
+                    Message = "You can go home now...",
                     Type = NotificationType.Information,
 
-                }, onClose: () => { _acceptEnoughTime = true; });
+                });
 
             }
             // Forcing the CommandManager to raise the RequerySuggested event
