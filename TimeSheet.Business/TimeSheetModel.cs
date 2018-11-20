@@ -1,14 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TimeSheet.Model
+namespace TimeSheet.Business
 {
-    public class TimeSheetDto
+    public class TimeSheetModel
     {
 
+        public TimeSheetModel()
+        {
+
+        }
+
+        public ObservableCollection<TimeSheetInfo> TimeSheetInfos
+        {
+            get; set;
+        }
+
+        public void LoadTimeSheetInfos()
+        {
+
+        }
+    }
+
+    public class TimeSheetInfo
+    {
         public string osdTimesheetId { get; set; }
         public DateTime osdTimeOut { get; set; }
 
@@ -47,8 +67,16 @@ namespace TimeSheet.Model
             {
                 // forgot checkin
                 if (osdHoursPerDay == 0 || (osdHoursPerDay - 0.5 < 6))
+                {
+                    var now = DateTime.Now;
+                    var noonTime = new DateTime(now.Year, now.Month, now.Day, 13, 0, 0);
+                    if (now < noonTime)
+                    {
+                        return (DateTime.Now - osdTimeIn).TotalHours;
+                    }
                     return (DateTime.Now - osdTimeIn).TotalHours - 1.5;
-                
+                }
+
                 return osdHoursPerDay - 0.5;
             }
         }
@@ -91,8 +119,9 @@ namespace TimeSheet.Model
         {
             get
             {
-                return (TotalHour < 12 && TotalHour > -0.5) ?  Expected.ToString("t"): "--:--";
+                return (TotalHour < 12 && TotalHour > -0.5) ? Expected.ToString("t") : "--:--";
             }
         }
+
     }
 }

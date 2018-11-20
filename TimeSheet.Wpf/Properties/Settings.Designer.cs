@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TimeSheet.Properties
+namespace TimeSheet.Wpf.Properties
 {
 
 
