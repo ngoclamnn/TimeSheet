@@ -8,7 +8,20 @@
         Title="{Binding Title}" Height="450" Width="800"
           DataContext="{Binding Main, Source={StaticResource Locator}}">
     <Grid>
-        <DataGrid HeadersVisibility="Column" ItemsSource="{Binding Data}" Name="dataGrid" Margin="13,185,9,20" AutoGenerateColumns="False" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Label Content="Total until now:" HorizontalAlignment="Left" Margin="30"  VerticalAlignment="Top" Grid.Row="0"/>
+        <Label Name="lbTotalTime" Content="" HorizontalAlignment="Left" Margin="60"  VerticalAlignment="Top"  Grid.Row="0" RenderTransformOrigin="7.4,0.577"/>
+        <Label Content="UserId:" HorizontalAlignment="Left"  VerticalAlignment="Top" Grid.Row="0"/>
+        <TextBox Name="lbUserId" Padding="3" Text="00013" HorizontalAlignment="Left" Height="23" Grid.Row="0" TextWrapping="Wrap"  Width="120"/>
+
+        <DataGrid Grid.Row="1" Grid.RowSpan="2" HeadersVisibility="Column" ItemsSource="{Binding Data}" Name="dataGrid" Margin="10,10,10,10" AutoGenerateColumns="False" >
             <DataGrid.Columns>
                 <DataGridTextColumn IsReadOnly="True" Header="Weekday" Width="*" Binding="{Binding DisplayDayOfWeek}" ></DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="In" Width="*" Binding="{Binding osdTimeIn, StringFormat=t}" ></DataGridTextColumn>
@@ -18,11 +31,5 @@
                 <DataGridTextColumn IsReadOnly="True" Header="Expected Out" Width="*" Binding="{Binding DisplayExpected}"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Label Content="Total until now:" HorizontalAlignment="Left" Margin="200,132,0,0" VerticalAlignment="Top"/>
-        <Label Name="lbTotalTime" Content="" HorizontalAlignment="Left" Margin="290,132,0,0" VerticalAlignment="Top" RenderTransformOrigin="7.4,0.577"/>
-        <Label Content="UserId:" HorizontalAlignment="Left" Margin="14,132,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="lbUserId" Padding="3" Text="00013" HorizontalAlignment="Left" Height="23" Margin="64,134,0,261" TextWrapping="Wrap"  Width="120"/>
-
-
     </Grid>
 </Window>
