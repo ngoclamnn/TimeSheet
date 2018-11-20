@@ -43,6 +43,7 @@ namespace TimeSheet.Wpf.ViewModel
             ////}
 
             SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<StudentViewModel>();
         }
 
         public MainViewModel Main
@@ -52,7 +53,14 @@ namespace TimeSheet.Wpf.ViewModel
                 return ServiceLocator.Current.GetInstance<MainViewModel>();
             }
         }
-        
+        public StudentViewModel Student
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<StudentViewModel>();
+            }
+        }
+
         public static void Cleanup()
         {
             // TODO Clear the ViewModels

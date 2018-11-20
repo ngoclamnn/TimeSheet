@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TimeSheet.Wpf"
+        xmlns:views = "clr-namespace:TimeSheet.Wpf.Views" 
         mc:Ignorable="d"
         Title="{Binding Title}" Height="450" Width="800"
           DataContext="{Binding Main, Source={StaticResource Locator}}">
@@ -16,20 +16,36 @@
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
-        <Label Content="Total until now:" HorizontalAlignment="Left" Margin="30"  VerticalAlignment="Top" Grid.Row="0"/>
-        <Label Name="lbTotalTime" Content="" HorizontalAlignment="Left" Margin="60"  VerticalAlignment="Top"  Grid.Row="0" RenderTransformOrigin="7.4,0.577"/>
-        <Label Content="UserId:" HorizontalAlignment="Left"  VerticalAlignment="Top" Grid.Row="0"/>
-        <TextBox Name="lbUserId" Padding="3" Text="00013" HorizontalAlignment="Left" Height="23" Grid.Row="0" TextWrapping="Wrap"  Width="120"/>
+        <Label Width="100" Height="24" Content="Total until now:"    VerticalAlignment="Top" Grid.Row="0" Margin="10,57,683.6,0"/>
+        <Label Width="100" Height="24" Name="lbTotalTime" Content=""    VerticalAlignment="Top"  Grid.Row="0" Margin="110,57,583.6,0"/>
+        <Label Width="50" Height="24" Content="UserId:"  Grid.Row="0" Margin="10,9,733.6,107"/>
+        <TextBox Name="lbUserId" Padding="3" Text="00013" Width="100"  Grid.Row="0" Height="23" TextWrapping="Wrap" Margin="0,10,628.6,0" VerticalAlignment="Top" HorizontalAlignment="Right"/>
 
-        <DataGrid Grid.Row="1" Grid.RowSpan="2" HeadersVisibility="Column" ItemsSource="{Binding Data}" Name="dataGrid" Margin="10,10,10,10" AutoGenerateColumns="False" >
+        <DataGrid Grid.Row="1"  HeadersVisibility="Column" ItemsSource="{Binding Data}" Name="dataGrid" Margin="10,10,10,10" AutoGenerateColumns="False" >
             <DataGrid.Columns>
-                <DataGridTextColumn IsReadOnly="True" Header="Weekday" Width="*" Binding="{Binding DisplayDayOfWeek}" ></DataGridTextColumn>
-                <DataGridTextColumn IsReadOnly="True" Header="In" Width="*" Binding="{Binding osdTimeIn, StringFormat=t}" ></DataGridTextColumn>
-                <DataGridTextColumn IsReadOnly="True" Header="Out" Width="*" Binding="{Binding DisplayTimeOut}"></DataGridTextColumn>
-                <DataGridTextColumn IsReadOnly="True" Header="Total" Width="*" Binding="{Binding DisplayTotalHour}"></DataGridTextColumn>
-                <DataGridTextColumn IsReadOnly="True" Header="Missing" Width="*" Binding="{Binding DisplayMissing}"></DataGridTextColumn>
-                <DataGridTextColumn IsReadOnly="True" Header="Expected Out" Width="*" Binding="{Binding DisplayExpected}"></DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="Weekday" Width="*" Binding="{Binding DisplayDayOfWeek}" >
+
+                </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="In" Width="*" Binding="{Binding osdTimeIn, StringFormat=t}" >
+
+                </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="Out" Width="*" Binding="{Binding DisplayTimeOut}">
+
+                </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="Total" Width="*" Binding="{Binding DisplayTotalHour}">
+
+                </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="Missing" Width="*" Binding="{Binding DisplayMissing}">
+
+                </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="Expected Out" Width="*" Binding="{Binding DisplayExpected}">
+
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <views:StudentView Grid.Row="2" Grid.Column="1"  x:Name ="Student"/>
     </Grid>
+
+
+
 </Window>

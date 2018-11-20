@@ -45,8 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data.cs" />
+    <Compile Include="Models\StudentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TimeSheetModel.cs" />
+    <Compile Include="Models\TimeSheetModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

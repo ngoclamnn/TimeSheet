@@ -1,6 +1,7 @@
 using GalaSoft.MvvmLight;
 using System.Collections.Generic;
 using TimeSheet.Business;
+using TimeSheet.Models;
 
 namespace TimeSheet.Wpf.ViewModel
 {
@@ -43,5 +44,8 @@ namespace TimeSheet.Wpf.ViewModel
                 return data.GetData();
             }
         }
+
+         
+
     }
 }
