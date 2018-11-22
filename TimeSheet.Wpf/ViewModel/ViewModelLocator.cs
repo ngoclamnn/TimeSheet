@@ -15,6 +15,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using CommonServiceLocator;
+using TimeSheet.Business.Services;
 
 namespace TimeSheet.Wpf.ViewModel
 {
@@ -31,19 +32,18 @@ namespace TimeSheet.Wpf.ViewModel
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            ////if (ViewModelBase.IsInDesignModeStatic)
-            ////{
-            ////    // Create design time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DesignDataService>();
-            ////}
-            ////else
-            ////{
-            ////    // Create run time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DataService>();
-            ////}
+            if (ViewModelBase.IsInDesignModeStatic)
+            {
+                // Create design time view services and models
+                SimpleIoc.Default.Register<IDataService, DesignDataService>();
+            }
+            else
+            {
+                // Create run time view services and models
+                SimpleIoc.Default.Register<IDataService, DesignDataService>();
+            }
 
             SimpleIoc.Default.Register<MainViewModel>();
-            SimpleIoc.Default.Register<StudentViewModel>();
         }
 
         public MainViewModel Main
@@ -51,13 +51,6 @@ namespace TimeSheet.Wpf.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<MainViewModel>();
-            }
-        }
-        public StudentViewModel Student
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<StudentViewModel>();
             }
         }
 

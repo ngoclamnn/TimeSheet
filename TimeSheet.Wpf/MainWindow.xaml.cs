@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Notifications.Wpf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,9 @@ namespace TimeSheet.Wpf
             InitializeComponent();
         }
 
-
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(Environment.ExitCode);
+        }
     }
 }
