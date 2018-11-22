@@ -88,7 +88,7 @@ namespace TimeSheet.Wpf.ViewModel
             _notificationManager = new NotificationManager();
             ReadAllCommand.Execute(null);
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMinutes(0.1);
+            timer.Interval = TimeSpan.FromMinutes(1);
             timer.Tick += new EventHandler(TimerTick);
             timer.Start();
 
@@ -107,7 +107,7 @@ namespace TimeSheet.Wpf.ViewModel
                         Title = "Conexus timesheet",
                         Message = "Can go home. Remember to check your finger.",
                         Type = NotificationType.Information,
-                    }, onClick: () => PostPone = true);
+                    }, onClose: () => PostPone = true);
                 }
             }
         }
