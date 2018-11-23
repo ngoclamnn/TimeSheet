@@ -30,26 +30,42 @@ namespace TimeSheet.Models
     public class TimeSheetInfo
     {
         public string osdTimesheetId { get; set; }
-        public DateTime osdTimeOut { get; set; }
-
+        public DateTime? osdTimeIn { get; set; }
+        public DateTime? osdTimeOut { get; set; }
+        public string osdFullNameEN { get; set; }
+        public string osdFullNameVN { get; set; }
+        public double osdHoursPerDay { get; set; }
+        public double osdHoursPerDayUntilNow { get; set; }
+        public double osdFullHoursPerday { get; set; }
+        public DateTime osdWorkingDate { get; set; }
+        public string LastName { get; set; }
+        public string MidName { get; set; }
+        public string FirstName { get; set; }
+        public int LimitedTime { get; set; }
         public bool IsCurrentDate
         {
             get
             {
-                return DateTime.Now.DayOfWeek == osdTimeIn.DayOfWeek;
+                if (!osdTimeIn.HasValue)
+                    return false;
+                return DateTime.Now.DayOfWeek == osdTimeIn.Value.DayOfWeek;
             }
         }
         public string DisplayTimeOut
         {
             get
             {
-                return (osdTimeOut == osdTimeIn) ? "--:--" : osdTimeOut.ToString("t");
+                if (!osdTimeIn.HasValue)
+                    return "--:--";
+                return (osdTimeOut == osdTimeIn) ? "--:--" : osdTimeOut.Value.ToString("t");
             }
         }
         public string DisplayTotalHour
         {
             get
             {
+                if (!osdTimeIn.HasValue)
+                    return "--:--";
                 var ts = TimeSpan.FromHours(TotalHour);
                 return ts.Hours.ToString("D2") + ":" + ts.Minutes.ToString("D2");
             }
@@ -58,13 +74,17 @@ namespace TimeSheet.Models
         {
             get
             {
-                return osdTimeIn.DayOfWeek.ToString();
+                if (!osdTimeIn.HasValue)
+                    return "--:--";
+                return osdTimeIn.Value.DayOfWeek.ToString();
             }
         }
         public double TotalHour
         {
             get
             {
+                if (!osdTimeIn.HasValue)
+                    return 0;
                 // forgot checkin
                 if (osdHoursPerDay == 0 || (osdHoursPerDay - 0.5 < 6))
                 {
@@ -72,19 +92,21 @@ namespace TimeSheet.Models
                     var noonTime = new DateTime(now.Year, now.Month, now.Day, 13, 0, 0);
                     if (now < noonTime)
                     {
-                        return (DateTime.Now - osdTimeIn).TotalHours;
+                        return (DateTime.Now - osdTimeIn).Value.TotalHours;
                     }
-                    return (DateTime.Now - osdTimeIn).TotalHours - 1.5;
+                    return (DateTime.Now - osdTimeIn).Value.TotalHours - 1.5;
                 }
 
                 return osdHoursPerDay - 0.5;
             }
         }
-        public DateTime osdTimeIn { get; set; }
+      
         public string DisplayMissing
         {
             get
             {
+                if (!osdTimeIn.HasValue)
+                    return "--:--";
                 var ts = TimeSpan.FromHours(Missing);
                 return ts.Hours.ToString("D2") + ":" + ts.Minutes.ToString("D2");
             }
@@ -96,22 +118,11 @@ namespace TimeSheet.Models
                 return 8 - TotalHour;
             }
         }
-        public string osdFullNameEN { get; set; }
-        public string osdFullNameVN { get; set; }
-        public double osdHoursPerDay { get; set; }
-        public double osdHoursPerDayUntilNow { get; set; }
-        public double osdFullHoursPerday { get; set; }
-        public DateTime osdWorkingDate { get; set; }
-        public string LastName { get; set; }
-        public string MidName { get; set; }
-        public string FirstName { get; set; }
-        public int LimitedTime { get; set; }
-
         public DateTime Expected
         {
             get
             {
-                return osdTimeIn.AddHours(9.5);
+                return osdTimeIn.Value.AddHours(9.5);
             }
         }
 
@@ -119,9 +130,14 @@ namespace TimeSheet.Models
         {
             get
             {
+                if (!osdTimeIn.HasValue)
+                    return "--:--";
                 return (TotalHour < 12 && TotalHour > -0.5) ? Expected.ToString("t") : "--:--";
             }
         }
+      
+
+        
 
     }
 }

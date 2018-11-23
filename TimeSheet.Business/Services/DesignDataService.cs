@@ -12,7 +12,7 @@ namespace TimeSheet.Business.Services
 {
     public class DesignDataService : IDataService
     {
-        public ObservableCollection<TimeSheetInfo> GetData(string empId)
+        public List<TimeSheetInfo> GetData(string empId)
         {
             DateTime baseDate = DateTime.Today;
 
@@ -31,7 +31,7 @@ namespace TimeSheet.Business.Services
 
                 string json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 var data = JsonConvert.DeserializeObject<List<TimeSheetInfo>>(json, new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Local });
-                return new ObservableCollection<TimeSheetInfo>(data);
+                return data;
             }
         }
     }

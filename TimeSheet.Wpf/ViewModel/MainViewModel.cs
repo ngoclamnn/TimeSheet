@@ -4,7 +4,9 @@ using Notifications.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
+using System.Windows.Media;
 using System.Windows.Threading;
 using TimeSheet.Business;
 using TimeSheet.Business.Services;
@@ -83,7 +85,7 @@ namespace TimeSheet.Wpf.ViewModel
             }
             _serviceProxy = serviceProxy;
             UserId = "00013";
-            TimeSheetInfos = new ObservableCollection<TimeSheetInfo>();
+            TimeSheetInfos = new ObservableCollection<TimeSheetInfoRow>();
             ReadAllCommand = new RelayCommand(() => GetData(UserId));
             _notificationManager = new NotificationManager();
             ReadAllCommand.Execute(null);
@@ -99,8 +101,8 @@ namespace TimeSheet.Wpf.ViewModel
             ReadAllCommand.Execute(null);
             if (!IsInDesignMode)
             {
-                var currentDateTimeSheet = _timeSheetInfos.FirstOrDefault(x => x.IsCurrentDate);
-                if (!PostPone && currentDateTimeSheet.TotalHour >= 7)
+                var currentDateTimeSheet = _timeSheetInfos.FirstOrDefault(x => x.Info.IsCurrentDate);
+                if (!PostPone && currentDateTimeSheet.Info.TotalHour >= 7)
                 {
                     _notificationManager.Show(new NotificationContent
                     {
@@ -114,9 +116,9 @@ namespace TimeSheet.Wpf.ViewModel
 
         public string Title { get; set; }
 
-        ObservableCollection<TimeSheetInfo> _timeSheetInfos;
+        ObservableCollection<TimeSheetInfoRow> _timeSheetInfos;
 
-        public ObservableCollection<TimeSheetInfo> TimeSheetInfos
+        public ObservableCollection<TimeSheetInfoRow> TimeSheetInfos
         {
             get { return _timeSheetInfos; }
             set
@@ -130,10 +132,10 @@ namespace TimeSheet.Wpf.ViewModel
             TimeSheetInfos.Clear();
             foreach (var item in _serviceProxy.GetData(empId))
             {
-                TimeSheetInfos.Add(item);
+                TimeSheetInfos.Add(new TimeSheetInfoRow { Info = item });
             }
-            UserFullName = "Name: " + TimeSheetInfos[0].osdFullNameVN;
-            var ts = TimeSpan.FromHours(TimeSheetInfos.Sum(x => x.TotalHour));
+            UserFullName = "Name: " + TimeSheetInfos[0].Info.osdFullNameVN;
+            var ts = TimeSpan.FromHours(TimeSheetInfos.Sum(x => x.Info.TotalHour));
             DisplayTotalHour = "Total until now: " + ((int)ts.TotalHours).ToString("D2") + ":" + ts.Minutes.ToString("D2");
 
         }
@@ -141,5 +143,24 @@ namespace TimeSheet.Wpf.ViewModel
 
 
 
+    }
+
+    public class TimeSheetInfoRow : ViewModelBase
+    {
+        private Color _backgroundColor; 
+        public TimeSheetInfo Info { get; set; }
+        public string Tooltip { get; set; }
+        public Color MissingBackgroundColor
+        {
+            get
+            {
+                return (Color)ColorConverter.ConvertFromString("Red");
+            }
+            set
+            {
+                _backgroundColor = value;
+                RaisePropertyChanged("BackgroundColor");
+            }
+        }
     }
 }

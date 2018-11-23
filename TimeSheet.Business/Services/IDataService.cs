@@ -10,6 +10,6 @@ namespace TimeSheet.Business.Services
 {
     public interface IDataService
     {
-        ObservableCollection<TimeSheetInfo> GetData(string empId);
+        List<TimeSheetInfo> GetData(string empId);
     }
 }
