@@ -102,7 +102,7 @@ namespace TimeSheet.Wpf.ViewModel
             if (!IsInDesignMode)
             {
                 var currentDateTimeSheet = _timeSheetInfos.FirstOrDefault(x => x.Info.IsCurrentDate);
-                if (!PostPone && currentDateTimeSheet.Info.TotalHour >= 7)
+                if (currentDateTimeSheet != null && !PostPone && currentDateTimeSheet.Info.TotalHour >= 7)
                 {
                     _notificationManager.Show(new NotificationContent
                     {
@@ -147,19 +147,50 @@ namespace TimeSheet.Wpf.ViewModel
 
     public class TimeSheetInfoRow : ViewModelBase
     {
-        private Color _backgroundColor; 
         public TimeSheetInfo Info { get; set; }
-        public string Tooltip { get; set; }
-        public Color MissingBackgroundColor
+        public string OutTooltip
         {
             get
             {
-                return (Color)ColorConverter.ConvertFromString("Red");
+                if ((Info.osdTimeOut.Value - Info.osdTimeIn.Value).TotalHours <= 10.0)
+                    return "Unusual check out time";
+                else
+                    return null;
             }
-            set
+        }
+        public SolidColorBrush OutForeColor
+        {
+            get
             {
-                _backgroundColor = value;
-                RaisePropertyChanged("BackgroundColor");
+                if ((Info.osdTimeOut.Value - Info.osdTimeIn.Value).TotalHours <= 10.0)
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Red"));
+                else
+                {
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Black"));
+                }
+            }
+        }
+
+        public SolidColorBrush MissingBackgroundColor
+        {
+            get
+            {
+                if (Info.Missing <= 0)
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Green"));
+                else
+                {
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Red"));
+                }
+            }
+        }
+        public SolidColorBrush MissingForeColor
+        {
+            get
+            {
+                if (Info.Missing <= 0)
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("White"));
+                else
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Black"));
             }
         }
     }

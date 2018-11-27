@@ -21,54 +21,33 @@
 
         <DataGrid Grid.Row="1"  HeadersVisibility="Column" ItemsSource="{Binding TimeSheetInfos}" Name="dataGrid" Margin="10,10,10,10" AutoGenerateColumns="False" >
             <DataGrid.Columns>
-                <DataGridTextColumn IsReadOnly="True" Header="Weekday" Width="*" Binding="{Binding MissingBackgroundColor}" >
-
+                <DataGridTextColumn IsReadOnly="True" Header="Weekday" Width="*" Binding="{Binding Info.DisplayDayOfWeek}" >
                 </DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="In" Width="*" Binding="{Binding Info.osdTimeIn, StringFormat=t}" >
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Background">
-                                <Setter.Value>
-                                    <SolidColorBrush Color="{Binding MissingBackgroundColor}"/>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-
-                    </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Out" Width="*" Binding="{Binding Info.DisplayTimeOut}">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">
-                            <Setter Property="Background" Value="{Binding MissingBackgroundColor}" />
+                            <Setter Property="Foreground" Value="{Binding OutForeColor}" />
+                            <Setter Property="ToolTip" Value="{Binding OutTooltip}" />
                         </Style>
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Total" Width="*" Binding="{Binding Info.DisplayTotalHour}">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Background" Value="{Binding MissingBackgroundColor}" />
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Missing" Width="*" Binding="{Binding Info.DisplayMissing}">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Setter Property="Background" Value="{Binding MissingBackgroundColor}" />
+                            <Setter Property="Foreground" Value="{Binding MissingForeColor}" />
                         </Style>
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Expected Out" Width="*" Binding="{Binding Info.DisplayExpected}">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Background" Value="{Binding ExpectedBackgroundColor}" />
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <Label Height="27" Content="{Binding UserFullName}"  VerticalAlignment="Top"  Grid.Row="0" Margin="23,40,0,0" HorizontalAlignment="Left" Width="190"/>
-        <TextBox x:Name="lbUserId_Copy" Padding="3" Text="{Binding UserFullName}"  Grid.Row="0" Height="23" TextWrapping="Wrap" Margin="190,12,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="95"/>
         <Label Height="27" Content="{Binding UserFullName}"  VerticalAlignment="Top"  Grid.Row="0" Margin="23,40,0,0" HorizontalAlignment="Left" Width="190"/>
     </Grid>
 
