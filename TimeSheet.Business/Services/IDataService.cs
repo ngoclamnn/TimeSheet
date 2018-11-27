@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TimeSheet.Models;
+﻿using System.Collections.Generic;
+using TimeSheet.Business.Models;
 
 namespace TimeSheet.Business.Services
 {
     public interface IDataService
     {
-        List<TimeSheetInfo> GetData(string empId);
+        List<TimeSheetInfo> GetData(string empId, bool getRawData = false);
     }
 }

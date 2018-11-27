@@ -2,15 +2,12 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Notifications.Wpf;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Threading;
-using TimeSheet.Business;
+using TimeSheet.Business.Models;
 using TimeSheet.Business.Services;
-using TimeSheet.Models;
 
 namespace TimeSheet.Wpf.ViewModel
 {
@@ -86,7 +83,7 @@ namespace TimeSheet.Wpf.ViewModel
             _serviceProxy = serviceProxy;
             UserId = "00013";
             TimeSheetInfos = new ObservableCollection<TimeSheetInfoRow>();
-            ReadAllCommand = new RelayCommand(() => GetData(UserId));
+            ReadAllCommand = new RelayCommand(() => GetData(UserId, false));
             _notificationManager = new NotificationManager();
             ReadAllCommand.Execute(null);
             timer = new DispatcherTimer();
@@ -94,6 +91,20 @@ namespace TimeSheet.Wpf.ViewModel
             timer.Tick += new EventHandler(TimerTick);
             timer.Start();
 
+        }
+        private bool _actualData;
+        public bool ActualData
+        {
+            get
+            {
+                return _actualData;
+            }
+            set
+            {
+                _actualData = value;
+                GetData(UserId, true);
+                RaisePropertyChanged("ActualData");
+            }
         }
         private bool PostPone = false;
         private void TimerTick(object send, EventArgs e)
@@ -127,10 +138,11 @@ namespace TimeSheet.Wpf.ViewModel
                 RaisePropertyChanged("TimeSheetInfos");
             }
         }
-        public void GetData(string empId)
+        public void GetData(string empId, bool getRawData)
         {
             TimeSheetInfos.Clear();
-            foreach (var item in _serviceProxy.GetData(empId))
+            var data = _serviceProxy.GetData(empId, getRawData);
+            foreach (var item in data)
             {
                 TimeSheetInfos.Add(new TimeSheetInfoRow { Info = item });
             }
@@ -152,7 +164,7 @@ namespace TimeSheet.Wpf.ViewModel
         {
             get
             {
-                if ((Info.osdTimeOut.Value - Info.osdTimeIn.Value).TotalHours <= 10.0)
+                if (Info.Missing > 0 && Info.TotalHour < 8)
                     return "Unusual check out time";
                 else
                     return null;
@@ -162,7 +174,7 @@ namespace TimeSheet.Wpf.ViewModel
         {
             get
             {
-                if ((Info.osdTimeOut.Value - Info.osdTimeIn.Value).TotalHours <= 10.0)
+                if (Info.osdTimeOut != Info.osdTimeIn && Info.Missing > 0 && Info.TotalHour < 8)
                     return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Red"));
                 else
                 {
@@ -187,10 +199,7 @@ namespace TimeSheet.Wpf.ViewModel
         {
             get
             {
-                if (Info.Missing <= 0)
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("White"));
-                else
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Black"));
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("White"));
             }
         }
     }

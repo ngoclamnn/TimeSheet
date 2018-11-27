@@ -1,18 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using TimeSheet.Models;
+using TimeSheet.Business.Models;
 
 namespace TimeSheet.Business.Services
 {
     public class DesignDataService : IDataService
     {
-        public List<TimeSheetInfo> GetData(string empId)
+        public List<TimeSheetInfo> GetData(string empId, bool getRawData = false)
         {
             DateTime baseDate = DateTime.Today;
 

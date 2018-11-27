@@ -40,7 +40,7 @@ namespace TimeSheet.Wpf.ViewModel
             else
             {
                 // Create run time view services and models
-                SimpleIoc.Default.Register<IDataService, DesignDataService>();
+                SimpleIoc.Default.Register<IDataService, DataService>();
             }
 
             SimpleIoc.Default.Register<MainViewModel>();

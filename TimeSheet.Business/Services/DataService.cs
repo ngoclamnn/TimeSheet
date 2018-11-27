@@ -1,21 +1,20 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using TimeSheet.Models;
+using System.Net.Http.Headers;
+using TimeSheet.Business.Models;
 
 namespace TimeSheet.Business.Services
 {
     public class DataService : IDataService
     {
-        public List<TimeSheetInfo> GetData(string empId)
+        public List<TimeSheetInfo> GetData(string empId, bool getRawData = false)
         {
             DateTime baseDate = DateTime.Today;
-
+            var data = new List<TimeSheetInfo>();
             var today = baseDate;
             var thisWeekStart = baseDate.AddDays(-(int)baseDate.DayOfWeek);
             var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
@@ -30,8 +29,89 @@ namespace TimeSheet.Business.Services
                     .GetAwaiter().GetResult();
 
                 string json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var data = JsonConvert.DeserializeObject<List<TimeSheetInfo>>(json, new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Local });
-                return data;
+                data = JsonConvert.DeserializeObject<List<TimeSheetInfo>>(json, new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Local });
+
+            }
+
+            var uri = new Uri("https://portal.orientsoftware.net/_api/");
+            var leaveData = new List<LeaveRequestModel>();
+            var credentialsCache = new CredentialCache { { uri, "NTLM", CredentialCache.DefaultNetworkCredentials } };
+            var handler = new HttpClientHandler { Credentials = credentialsCache };
+            using (var httpClient1 = new HttpClient(handler))
+            {
+                httpClient1.BaseAddress = uri;
+                httpClient1.Timeout = new TimeSpan(0, 0, 10);
+                httpClient1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var response = httpClient1.GetAsync("web/lists/getbytitle('OsdLeaveRequest')/items?$filter=Author%2FEMail eq 'lam.nguyen%40orientsoftware.net'").Result;
+                string json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                var jsonValue = JObject.Parse(json).GetValue("value");
+                leaveData = JsonConvert.DeserializeObject<List<LeaveRequestModel>>(jsonValue.ToString(), new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Local });
+
+            }
+            ProcessData(data, leaveData);
+            return data;
+        }
+
+        private void ProcessData(List<TimeSheetInfo> data, List<LeaveRequestModel> leaveData)
+        {
+            foreach (var item in data)
+            {
+
+                if (!item.osdTimeIn.HasValue)
+                    item.IsCurrentDate = false;
+                else
+                    item.IsCurrentDate = DateTime.Now.DayOfWeek == item.osdTimeIn.Value.DayOfWeek;
+
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayTimeOut = "--:--";
+                else
+                    item.DisplayTimeOut = (item.osdTimeOut == item.osdTimeIn) ? "--:--" : item.osdTimeOut.Value.ToString("t");
+
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayTotalHour = "--:--";
+                else
+                {
+                    var ts = TimeSpan.FromHours(item.TotalHour);
+                    item.DisplayTotalHour = ts.Hours.ToString("D2") + ":" + ts.Minutes.ToString("D2");
+                }
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayDayOfWeek = "--:--";
+                else
+                    item.DisplayDayOfWeek = item.osdTimeIn.Value.DayOfWeek.ToString();
+
+
+                if (!item.osdTimeIn.HasValue)
+                    item.TotalHour = 0;
+                if (!item.osdTimeOut.HasValue || item.osdHoursPerDay == 0)
+                {
+                    var now = DateTime.Now;
+                    var noonTime = new DateTime(now.Year, now.Month, now.Day, 13, 0, 0);
+                    if (now < noonTime)
+                    {
+                        item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours;
+                    }
+                    item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours - 1.5;
+                }
+                else
+                    item.TotalHour = item.osdHoursPerDay;
+
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayMissing = "--:--";
+                var ts = TimeSpan.FromHours(item.Missing);
+                item.DisplayMissing = ts.Hours.ToString("D2") + ":" + ts.Minutes.ToString("D2");
+
+                if (!item.osdTimeIn.HasValue && !item.osdTimeOut.HasValue)
+                {
+                    item.AnnualLeave = 1;
+                }
+                foreach (var leave in leaveData)
+                {
+                    if (item.osdTimeIn.Value.Date >= leave.FromDate.Date && item.osdTimeIn.Value.Date <= leave.ToDate.Date)
+                    {
+                        if (leave.FromDate.Date == leave.ToDate.Date)
+                            item.AnnualLeave = leave.TotalDay;
+                    }
+                }
             }
         }
     }

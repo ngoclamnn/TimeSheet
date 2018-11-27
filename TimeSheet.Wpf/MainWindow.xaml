@@ -33,6 +33,8 @@
                         </Style>
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="Annual leave" Width="*" Binding="{Binding Info.AnnualLeave}" >
+                </DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Total" Width="*" Binding="{Binding Info.DisplayTotalHour}">
                 </DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Missing" Width="*" Binding="{Binding Info.DisplayMissing}">
@@ -49,6 +51,7 @@
         </DataGrid>
 
         <Label Height="27" Content="{Binding UserFullName}"  VerticalAlignment="Top"  Grid.Row="0" Margin="23,40,0,0" HorizontalAlignment="Left" Width="190"/>
+        <CheckBox IsChecked="True"  Content="Actual data" Grid.Row="0" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
     </Grid>
 
 
