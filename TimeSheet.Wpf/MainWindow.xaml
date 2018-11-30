@@ -15,11 +15,11 @@
             <RowDefinition Height="1*"></RowDefinition>
             <RowDefinition Height="2*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Label Height="27" Content="{Binding Info.DisplayTotalHour}"    VerticalAlignment="Top"  Grid.Row="0" Margin="250,40,0,0" HorizontalAlignment="Left" Width="165"/>
+        <Label Height="27" Content="{Binding DisplayTotalHour}"    VerticalAlignment="Top"  Grid.Row="0" Margin="195,40,0,0" HorizontalAlignment="Left" Width="165"/>
         <Label Width="50" Height="27" Content="UserId:"  Grid.Row="0" Margin="23,11,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
         <TextBox Name="lbUserId" Padding="3" Text="{Binding UserId}"  Grid.Row="0" Height="23" TextWrapping="Wrap" Margin="78,12,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="95"/>
 
-        <DataGrid Grid.Row="1"  HeadersVisibility="Column" ItemsSource="{Binding TimeSheetInfos}" Name="dataGrid" Margin="10,10,10,10" AutoGenerateColumns="False" >
+        <DataGrid Grid.Row="1"  HeadersVisibility="Column" ItemsSource="{Binding TimeSheetInfos,  IsAsync=False}" Name="dataGrid" Margin="10,10,10,10" AutoGenerateColumns="False" >
             <DataGrid.Columns>
                 <DataGridTextColumn IsReadOnly="True" Header="Weekday" Width="*" Binding="{Binding Info.DisplayDayOfWeek}" >
                 </DataGridTextColumn>
@@ -51,7 +51,8 @@
         </DataGrid>
 
         <Label Height="27" Content="{Binding UserFullName}"  VerticalAlignment="Top"  Grid.Row="0" Margin="23,40,0,0" HorizontalAlignment="Left" Width="190"/>
-        <CheckBox IsChecked="True"  Content="Actual data" Grid.Row="0" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+        <CheckBox IsChecked="{Binding ActualData}" Content="Actual data" Grid.Row="0" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+        <Label Height="27" Content="{Binding DisplayMissingTotalHour}"    VerticalAlignment="Top"  Grid.Row="0" Margin="360,40,0,0" HorizontalAlignment="Left" Width="165"/>
     </Grid>
 
 

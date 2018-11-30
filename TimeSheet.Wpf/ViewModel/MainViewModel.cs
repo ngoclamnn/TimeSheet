@@ -66,6 +66,20 @@ namespace TimeSheet.Wpf.ViewModel
                 RaisePropertyChanged("DisplayTotalHour");
             }
         }
+
+        public string DisplayMissingTotalHour
+        {
+            get
+            {
+                return _displayMissingTotalHour;
+            }
+            set
+            {
+                _displayMissingTotalHour = value;
+                RaisePropertyChanged("DisplayMissingTotalHour");
+            }
+        }
+
         IDataService _serviceProxy;
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -83,7 +97,7 @@ namespace TimeSheet.Wpf.ViewModel
             _serviceProxy = serviceProxy;
             UserId = "00013";
             TimeSheetInfos = new ObservableCollection<TimeSheetInfoRow>();
-            ReadAllCommand = new RelayCommand(() => GetData(UserId, false));
+            ReadAllCommand = new RelayCommand(() => GetData(UserId, !_actualData));
             _notificationManager = new NotificationManager();
             ReadAllCommand.Execute(null);
             timer = new DispatcherTimer();
@@ -92,7 +106,7 @@ namespace TimeSheet.Wpf.ViewModel
             timer.Start();
 
         }
-        private bool _actualData;
+        private bool _actualData = true;
         public bool ActualData
         {
             get
@@ -102,8 +116,8 @@ namespace TimeSheet.Wpf.ViewModel
             set
             {
                 _actualData = value;
-                GetData(UserId, true);
                 RaisePropertyChanged("ActualData");
+                ReadAllCommand.Execute(null);
             }
         }
         private bool PostPone = false;
@@ -128,6 +142,7 @@ namespace TimeSheet.Wpf.ViewModel
         public string Title { get; set; }
 
         ObservableCollection<TimeSheetInfoRow> _timeSheetInfos;
+        private string _displayMissingTotalHour;
 
         public ObservableCollection<TimeSheetInfoRow> TimeSheetInfos
         {
@@ -140,16 +155,18 @@ namespace TimeSheet.Wpf.ViewModel
         }
         public void GetData(string empId, bool getRawData)
         {
-            TimeSheetInfos.Clear();
             var data = _serviceProxy.GetData(empId, getRawData);
+            var container = new ObservableCollection<TimeSheetInfoRow>();
             foreach (var item in data)
             {
-                TimeSheetInfos.Add(new TimeSheetInfoRow { Info = item });
+                container.Add(new TimeSheetInfoRow { Info = item });
             }
+            TimeSheetInfos = container;
             UserFullName = "Name: " + TimeSheetInfos[0].Info.osdFullNameVN;
             var ts = TimeSpan.FromHours(TimeSheetInfos.Sum(x => x.Info.TotalHour));
+            var ts1 = TimeSpan.FromHours(TimeSheetInfos.Sum(x => x.Info.Missing));
             DisplayTotalHour = "Total until now: " + ((int)ts.TotalHours).ToString("D2") + ":" + ts.Minutes.ToString("D2");
-
+            DisplayMissingTotalHour = "Missing: " + ((int)ts1.TotalHours).ToString("D2") + ":" + ts1.Minutes.ToString("D2");
         }
         public RelayCommand ReadAllCommand { get; set; }
 
@@ -174,7 +191,8 @@ namespace TimeSheet.Wpf.ViewModel
         {
             get
             {
-                if (Info.osdTimeOut != Info.osdTimeIn && Info.Missing > 0 && Info.TotalHour < 8)
+                var now = DateTime.Now;
+                if (Info.osdTimeOut.HasValue && Info.osdTimeOut.Value.Hour < 17)
                     return new SolidColorBrush((Color)ColorConverter.ConvertFromString("Red"));
                 else
                 {

@@ -48,11 +48,11 @@ namespace TimeSheet.Business.Services
                 leaveData = JsonConvert.DeserializeObject<List<LeaveRequestModel>>(jsonValue.ToString(), new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Local });
 
             }
-            ProcessData(data, leaveData);
+            ProcessData(data, leaveData, getRawData);
             return data;
         }
 
-        private void ProcessData(List<TimeSheetInfo> data, List<LeaveRequestModel> leaveData)
+        private void ProcessData(List<TimeSheetInfo> data, List<LeaveRequestModel> leaveData, bool getRawData)
         {
             foreach (var item in data)
             {
@@ -63,42 +63,7 @@ namespace TimeSheet.Business.Services
                     item.IsCurrentDate = DateTime.Now.DayOfWeek == item.osdTimeIn.Value.DayOfWeek;
 
                 if (!item.osdTimeIn.HasValue)
-                    item.DisplayTimeOut = "--:--";
-                else
-                    item.DisplayTimeOut = (item.osdTimeOut == item.osdTimeIn) ? "--:--" : item.osdTimeOut.Value.ToString("t");
-
-                if (!item.osdTimeIn.HasValue)
-                    item.DisplayTotalHour = "--:--";
-                else
-                {
-                    var ts = TimeSpan.FromHours(item.TotalHour);
-                    item.DisplayTotalHour = ts.Hours.ToString("D2") + ":" + ts.Minutes.ToString("D2");
-                }
-                if (!item.osdTimeIn.HasValue)
-                    item.DisplayDayOfWeek = "--:--";
-                else
-                    item.DisplayDayOfWeek = item.osdTimeIn.Value.DayOfWeek.ToString();
-
-
-                if (!item.osdTimeIn.HasValue)
                     item.TotalHour = 0;
-                if (!item.osdTimeOut.HasValue || item.osdHoursPerDay == 0)
-                {
-                    var now = DateTime.Now;
-                    var noonTime = new DateTime(now.Year, now.Month, now.Day, 13, 0, 0);
-                    if (now < noonTime)
-                    {
-                        item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours;
-                    }
-                    item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours - 1.5;
-                }
-                else
-                    item.TotalHour = item.osdHoursPerDay;
-
-                if (!item.osdTimeIn.HasValue)
-                    item.DisplayMissing = "--:--";
-                var ts = TimeSpan.FromHours(item.Missing);
-                item.DisplayMissing = ts.Hours.ToString("D2") + ":" + ts.Minutes.ToString("D2");
 
                 if (!item.osdTimeIn.HasValue && !item.osdTimeOut.HasValue)
                 {
@@ -112,7 +77,59 @@ namespace TimeSheet.Business.Services
                             item.AnnualLeave = leave.TotalDay;
                     }
                 }
+
+                if (!getRawData)
+                {
+                    var now = DateTime.Now;
+                    if (!item.osdTimeOut.HasValue || item.osdHoursPerDay == 0 || (item.IsCurrentDate && item.osdTimeOut.Value.Hour < 17))
+                    {
+                        var noonTime = new DateTime(now.Year, now.Month, now.Day, 13, 0, 0);
+                        if (now < noonTime)
+                        {
+                            item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours;
+                        }
+                        else
+                            item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours - 1.5;
+                    }
+                    else
+                        item.TotalHour = item.AnnualLeave > 0 ? item.osdFullHoursPerday : item.osdHoursPerDay - 0.5;
+                }
+                else
+                {
+                    item.TotalHour = item.osdHoursPerDay;
+                }
+                item.Missing = 8 - item.TotalHour - 8 * item.AnnualLeave;
+                item.Expected = item.osdTimeIn.Value.AddHours((item.AnnualLeave > 0 ? 8 * item.AnnualLeave : 9.5));
+
+
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayTimeOut = "--:--";
+                else
+                    item.DisplayTimeOut = (item.osdTimeOut == item.osdTimeIn) ? "--:--" : item.osdTimeOut.Value.ToString("t");
+
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayTotalHour = "--:--";
+                else
+                {
+                    var ts1 = TimeSpan.FromHours(item.TotalHour);
+                    item.DisplayTotalHour = ts1.Hours.ToString("D2") + ":" + ts1.Minutes.ToString("D2");
+                }
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayDayOfWeek = "--:--";
+                else
+                    item.DisplayDayOfWeek = item.osdTimeIn.Value.DayOfWeek.ToString();
+
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayMissing = "--:--";
+                var ts = TimeSpan.FromHours(item.Missing);
+                item.DisplayMissing = ts.Hours.ToString("D2") + ":" + ts.Minutes.ToString("D2");
+
+                if (!item.osdTimeIn.HasValue)
+                    item.DisplayExpected = "--:--";
+                else
+                    item.DisplayExpected = (item.TotalHour < 12 && item.TotalHour > -0.5) ? item.Expected.ToString("t") : "--:--";
             }
         }
     }
 }
+

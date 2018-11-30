@@ -50,27 +50,16 @@ namespace TimeSheet.Business.Models
         }
         public double Missing
         {
-            get
-            {
-                return 8 - TotalHour - 8 * AnnualLeave;
-            }
+            get;set;
         }
         public DateTime Expected
         {
-            get
-            {
-                return osdTimeIn.Value.AddHours((AnnualLeave > 0 ? 8 * AnnualLeave : 9.5));
-            }
+            get;set;
         }
 
         public string DisplayExpected
         {
-            get
-            {
-                if (!osdTimeIn.HasValue)
-                    return "--:--";
-                return (TotalHour < 12 && TotalHour > -0.5) ? Expected.ToString("t") : "--:--";
-            }
+            get;set;
         }
 
         public double AnnualLeave
