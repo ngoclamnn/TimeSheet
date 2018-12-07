@@ -11,8 +11,16 @@ namespace TimeSheet.Business.Services
 {
     public class DataService : IDataService
     {
-        public List<TimeSheetInfo> GetData(string empId, bool getRawData = false)
+        private List<TimeSheetInfo> _data;
+        private List<LeaveRequestModel> _leaveData;
+        private string _empId;
+        public List<TimeSheetInfo> GetData(string empId, bool useCheckOutDataForCurrentData = true)
         {
+            if (_empId == empId && _data != null && _leaveData != null)
+            {
+                ProcessData(_data, _leaveData, useCheckOutDataForCurrentData);
+                return _data;
+            }
             DateTime baseDate = DateTime.Today;
             var data = new List<TimeSheetInfo>();
             var today = baseDate;
@@ -30,7 +38,8 @@ namespace TimeSheet.Business.Services
 
                 string json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 data = JsonConvert.DeserializeObject<List<TimeSheetInfo>>(json, new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Local });
-
+                _data = data;
+                _empId = empId;
             }
 
             var uri = new Uri("https://portal.orientsoftware.net/_api/");
@@ -46,13 +55,13 @@ namespace TimeSheet.Business.Services
                 string json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 var jsonValue = JObject.Parse(json).GetValue("value");
                 leaveData = JsonConvert.DeserializeObject<List<LeaveRequestModel>>(jsonValue.ToString(), new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Local });
-
+                _leaveData = leaveData;
             }
-            ProcessData(data, leaveData, getRawData);
+            ProcessData(data, leaveData, useCheckOutDataForCurrentData);
             return data;
         }
 
-        private void ProcessData(List<TimeSheetInfo> data, List<LeaveRequestModel> leaveData, bool getRawData)
+        private void ProcessData(List<TimeSheetInfo> data, List<LeaveRequestModel> leaveData, bool useCheckOutDataForCurrentData)
         {
             foreach (var item in data)
             {
@@ -71,32 +80,38 @@ namespace TimeSheet.Business.Services
                 }
                 foreach (var leave in leaveData)
                 {
-                    if (item.osdTimeIn.Value.Date >= leave.FromDate.Date && item.osdTimeIn.Value.Date <= leave.ToDate.Date)
+                    //if(item.osdWorkingDate.Date == leave.)
+                    if (item.osdWorkingDate.Date >= leave.FromDate.Date && item.osdWorkingDate.Date <= leave.ToDate.Date)
                     {
                         if (leave.FromDate.Date == leave.ToDate.Date)
                             item.AnnualLeave = leave.TotalDay;
                     }
                 }
 
-                if (!getRawData)
+                if (useCheckOutDataForCurrentData)
                 {
                     var now = DateTime.Now;
-                    if (!item.osdTimeOut.HasValue || item.osdHoursPerDay == 0 || (item.IsCurrentDate && item.osdTimeOut.Value.Hour < 17))
+                    if (item.AnnualLeave > 0)
+                        item.TotalHour = 0;
+                    else
                     {
-                        var noonTime = new DateTime(now.Year, now.Month, now.Day, 13, 0, 0);
-                        if (now < noonTime)
+                        if (!item.osdTimeOut.HasValue || item.osdHoursPerDay == 0 || (item.IsCurrentDate && item.osdTimeOut.Value.Hour < 17))
                         {
-                            item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours;
+                            var noonTime = new DateTime(now.Year, now.Month, now.Day, 13, 0, 0);
+                            if (now < noonTime)
+                            {
+                                item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours;
+                            }
+                            else
+                                item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours - 1.5;
                         }
                         else
-                            item.TotalHour = (DateTime.Now - item.osdTimeIn).Value.TotalHours - 1.5;
+                            item.TotalHour = item.AnnualLeave > 0 ? item.osdFullHoursPerday : item.osdHoursPerDay - 0.5;
                     }
-                    else
-                        item.TotalHour = item.AnnualLeave > 0 ? item.osdFullHoursPerday : item.osdHoursPerDay - 0.5;
                 }
                 else
                 {
-                    item.TotalHour = item.osdHoursPerDay;
+                    item.TotalHour = item.osdHoursPerDay - 0.5;
                 }
                 item.Missing = 8 - item.TotalHour - 8 * item.AnnualLeave;
                 item.Expected = item.osdTimeIn.Value.AddHours((item.AnnualLeave > 0 ? 8 * item.AnnualLeave : 9.5));

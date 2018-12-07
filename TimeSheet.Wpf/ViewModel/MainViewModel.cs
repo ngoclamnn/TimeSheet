@@ -95,28 +95,29 @@ namespace TimeSheet.Wpf.ViewModel
                 Title = "Conexus timesheet monitor";
             }
             _serviceProxy = serviceProxy;
-            UserId = "00013";
+            
             TimeSheetInfos = new ObservableCollection<TimeSheetInfoRow>();
-            ReadAllCommand = new RelayCommand(() => GetData(UserId, !_actualData));
+            ReadAllCommand = new RelayCommand(() => GetData(_userId, !_useCheckOutDataForCurrentDate));
             _notificationManager = new NotificationManager();
-            ReadAllCommand.Execute(null);
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(1);
             timer.Tick += new EventHandler(TimerTick);
             timer.Start();
-
+            UserId = "00013";
+            ReadAllCommand.Execute(null);
         }
-        private bool _actualData = true;
-        public bool ActualData
+
+        private bool _useCheckOutDataForCurrentDate = false;
+        public bool UseCheckOutDataForCurrentDate
         {
             get
             {
-                return _actualData;
+                return _useCheckOutDataForCurrentDate;
             }
             set
             {
-                _actualData = value;
-                RaisePropertyChanged("ActualData");
+                _useCheckOutDataForCurrentDate = value;
+                RaisePropertyChanged("UseCheckOutDataForCurrentDate");
                 ReadAllCommand.Execute(null);
             }
         }
@@ -153,9 +154,9 @@ namespace TimeSheet.Wpf.ViewModel
                 RaisePropertyChanged("TimeSheetInfos");
             }
         }
-        public void GetData(string empId, bool getRawData)
+        public void GetData(string empId, bool useCheckOutDataForCurrentData)
         {
-            var data = _serviceProxy.GetData(empId, getRawData);
+            var data = _serviceProxy.GetData(empId, useCheckOutDataForCurrentData);
             var container = new ObservableCollection<TimeSheetInfoRow>();
             foreach (var item in data)
             {

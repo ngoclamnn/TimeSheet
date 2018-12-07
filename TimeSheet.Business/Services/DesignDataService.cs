@@ -8,7 +8,7 @@ namespace TimeSheet.Business.Services
 {
     public class DesignDataService : IDataService
     {
-        public List<TimeSheetInfo> GetData(string empId, bool getRawData = false)
+        public List<TimeSheetInfo> GetData(string empId, bool useCheckOutDataForCurrentData = true)
         {
             DateTime baseDate = DateTime.Today;
 

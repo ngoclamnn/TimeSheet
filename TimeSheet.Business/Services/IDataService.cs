@@ -5,6 +5,6 @@ namespace TimeSheet.Business.Services
 {
     public interface IDataService
     {
-        List<TimeSheetInfo> GetData(string empId, bool getRawData = false);
+        List<TimeSheetInfo> GetData(string empId, bool useCheckOutDataForCurrentData = true);
     }
 }

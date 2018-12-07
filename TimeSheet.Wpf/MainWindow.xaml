@@ -17,7 +17,8 @@
         </Grid.RowDefinitions>
         <Label Height="27" Content="{Binding DisplayTotalHour}"    VerticalAlignment="Top"  Grid.Row="0" Margin="195,40,0,0" HorizontalAlignment="Left" Width="165"/>
         <Label Width="50" Height="27" Content="UserId:"  Grid.Row="0" Margin="23,11,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-        <TextBox Name="lbUserId" Padding="3" Text="{Binding UserId}"  Grid.Row="0" Height="23" TextWrapping="Wrap" Margin="78,12,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="95"/>
+        <TextBox Name="lbUserId" Padding="3" Text="{Binding UserId}"  Grid.Row="0" Height="23" TextWrapping="Wrap" Margin="78,12,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="95">
+        </TextBox>
 
         <DataGrid Grid.Row="1"  HeadersVisibility="Column" ItemsSource="{Binding TimeSheetInfos,  IsAsync=False}" Name="dataGrid" Margin="10,10,10,10" AutoGenerateColumns="False" >
             <DataGrid.Columns>
@@ -50,9 +51,10 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Label Height="27" Content="{Binding UserFullName}"  VerticalAlignment="Top"  Grid.Row="0" Margin="23,40,0,0" HorizontalAlignment="Left" Width="190"/>
-        <CheckBox IsChecked="{Binding ActualData}" Content="Actual data" Grid.Row="0" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+        <Label Height="27" Content="{Binding UserFullName}" VerticalAlignment="Top"  Grid.Row="0" Margin="23,40,0,0" HorizontalAlignment="Left" Width="190"/>
         <Label Height="27" Content="{Binding DisplayMissingTotalHour}"    VerticalAlignment="Top"  Grid.Row="0" Margin="360,40,0,0" HorizontalAlignment="Left" Width="165"/>
+        <CheckBox IsChecked="{Binding UseCheckOutDataForCurrentDate}" Content="Use checkout data for current date" Grid.Row="0" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+        <Button Content="View" HorizontalAlignment="Left" Command="{Binding ReadAllCommand, ConverterParameter=null}" Margin="190,14,0,0" VerticalAlignment="Top" Width="75"/>
     </Grid>
 
 
