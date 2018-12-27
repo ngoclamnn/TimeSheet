@@ -97,7 +97,7 @@ namespace TimeSheet.Wpf.ViewModel
             _serviceProxy = serviceProxy;
             
             TimeSheetInfos = new ObservableCollection<TimeSheetInfoRow>();
-            ReadAllCommand = new RelayCommand(() => GetData(_userId, !_useCheckOutDataForCurrentDate));
+            ReadAllCommand = new RelayCommand(() => GetData(_userId, _useCheckOutDataForCurrentDate));
             _notificationManager = new NotificationManager();
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(1);
