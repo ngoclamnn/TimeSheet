@@ -55,6 +55,7 @@
         <Label Height="27" Content="{Binding DisplayMissingTotalHour}"    VerticalAlignment="Top"  Grid.Row="0" Margin="360,40,0,0" HorizontalAlignment="Left" Width="165"/>
         <CheckBox IsChecked="{Binding UseCheckOutDataForCurrentDate}" Content="Use checkout data for current date" Grid.Row="0" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
         <Button Content="View" HorizontalAlignment="Left" Command="{Binding ReadAllCommand, ConverterParameter=null}" Margin="190,14,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label Height="27" Content="{Binding ExpectedOutForToday}" VerticalAlignment="Top"  Grid.Row="0" Margin="360,67,0,0" HorizontalAlignment="Left" Width="220" Grid.RowSpan="2"/>
     </Grid>
 
 

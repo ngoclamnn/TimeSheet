@@ -79,6 +79,20 @@ namespace TimeSheet.Wpf.ViewModel
                 RaisePropertyChanged("DisplayMissingTotalHour");
             }
         }
+        private string _expectedOutForToday;
+
+        public string ExpectedOutForToday
+        {
+            get
+            {
+                return _expectedOutForToday;
+            }
+            set
+            {
+                _expectedOutForToday = value;
+                RaisePropertyChanged("ExpectedOutForToday");
+            }
+        }
 
         IDataService _serviceProxy;
         /// <summary>
@@ -128,7 +142,7 @@ namespace TimeSheet.Wpf.ViewModel
             if (!IsInDesignMode)
             {
                 var currentDateTimeSheet = _timeSheetInfos.FirstOrDefault(x => x.Info.IsCurrentDate);
-                if (currentDateTimeSheet != null && !PostPone && currentDateTimeSheet.Info.TotalHour >= 7)
+                if (currentDateTimeSheet != null && !PostPone && TimeSheetInfos.Sum(x => x.Info.Missing) <= 0)
                 {
                     _notificationManager.Show(new NotificationContent
                     {
@@ -165,9 +179,14 @@ namespace TimeSheet.Wpf.ViewModel
             TimeSheetInfos = container;
             UserFullName = "Name: " + TimeSheetInfos[0].Info.osdFullNameVN;
             var ts = TimeSpan.FromHours(TimeSheetInfos.Sum(x => x.Info.TotalHour));
-            var ts1 = TimeSpan.FromHours(TimeSheetInfos.Sum(x => x.Info.Missing));
+            var totalMissing = TimeSheetInfos.Sum(x => x.Info.Missing);
+            var missing = TimeSpan.FromHours(totalMissing);
             DisplayTotalHour = "Total until now: " + ((int)ts.TotalHours).ToString("D2") + ":" + ts.Minutes.ToString("D2");
-            DisplayMissingTotalHour = "Missing: " + ((int)ts1.TotalHours).ToString("D2") + ":" + ts1.Minutes.ToString("D2");
+            DisplayMissingTotalHour = "Missing: " + ((int)missing.TotalHours).ToString("D2") + ":" + missing.Minutes.ToString("D2");
+            var currentDateTimeSheet = _timeSheetInfos.FirstOrDefault(x => x.Info.IsCurrentDate);
+            var currentMissing = TimeSpan.FromHours(currentDateTimeSheet.Info.Missing);
+            var expectedToday = currentDateTimeSheet.Info.Expected.AddHours(totalMissing).AddHours(-currentMissing.TotalHours);
+            ExpectedOutForToday = "Expected out for today: " + expectedToday.ToString("t");
         }
         public RelayCommand ReadAllCommand { get; set; }
 
